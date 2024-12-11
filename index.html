@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Predictions and Accuracy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none;
+        }
+        .accuracy-badge {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Dataset for Analysis</h2>
+        <p>Please upload your CSV file containing heart disease measurements, following the format of the example csv data</p>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="dataFile" name="file" accept=".csv" required>
+            <button type="submit">Analyze Data</button>
+        </form>
+        
+        <div id="results" class="results">
+            <h3>Detailed Results:</h3>
+            <pre id="predictionOutput"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const fileField = document.querySelector('#dataFile');
+            formData.append('file', fileField.files[0]);
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    alert('Error: ' + result.error);
+                } else {
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('predictionOutput').textContent = 
+                        JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
